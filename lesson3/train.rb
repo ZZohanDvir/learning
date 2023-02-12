@@ -1,60 +1,55 @@
 class Train
-  attr_accessor :speed
-  attr_accessor :waggonage
-  Type = [:coach, :waggon]
+  attr_accessor :speed, :route
+  attr_reader :number, :type, :waggonage
 
-  def initialize(train_name, type, waggonage = 0)
-    if Type.include?(type)
-      @type = type
-    else
-      return 
-    end
-    @train_name = train_name
+  def initialize(number, type, waggonage)
+    @number = number
+    @type = type
     @waggonage = waggonage
-    @att_route = []
-    @current_station = []
-  end
-
-  def set_speed(speed)
-    self.speed = speed
+    @speed = 0
   end
 
   def stop
     self.speed = 0
   end
   
-  def current_speed
-    self.speed
-  end
-
-  def car_count
-    self.waggonage
-  end
-  
   def car_hook
     self.waggonage += 1 if self.speed == 0
-  end
 
   def car_unhook
-    self.waggonage += 1 if self.speed == 0
+    self.waggonage -= 1 if self.speed == 0 && @waggonage >= 1
   end
 
   def start_route(route)
-    @att_route = route.station_list
+    self.route = route
+    self.route.waypoint_list[0].train_arrive(self)
     @current_station = 0
   end
 
+  def current_station
+    route.waypoint_list[@current_station]
+  end
+
+  def previous_st
+    route.waggonage[@current_station - 1] if @current_station > 0
+  end
+
+  def next_st
+    route.waypoint_list[@current_station + 1]
+  end
+
   def run_forward
-    @current_station = @att_route[@current_station + 1]
+    return unless next_st
+    current_station.train_depart(self)
+    next_st.train_arrive(self)
+    @current_station += 1
   end
 
   def run_back
-    @current_station = @att_route[@current_station - 1]
+    return unless previous_st
+    current_station.train_depart(self)
+    previous_st.train_arrive(self)
+    @current_station -= 1
   end
 
-  def route_info
-    puts train.run_back
-    puts @current_station
-    puts train.run_forward
-  end
 end

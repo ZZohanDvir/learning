@@ -1,21 +1,19 @@
 class Route
+  attr_accessor: waypoint_list
+  
   def initialize(departure_st, arrival_st)
-    @departure_st = departure_st.name
-    @arrival_st = arrival_st.name
-    @waypoint_list = [@departure_st]
+    @waypoint_list = [departure_st, arrival_st]
   end
 
   def add_station
-    @waypoint_list << station
+    waypoint_list.insert(-2, station)
   end
 
   def  del_station
-    @waypoint_list.delete(station)
+    waypoint_list.delete(station)
   end
 
-  def station_list
-    @waypoint_list << @arrival_st
-    @waypoint_list.each {|station| puts station.name}
-    puts @arrival_st
+  def view_route
+    waypoint_list.each { |station| puts station.name }
   end
 end
