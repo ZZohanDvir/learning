@@ -1,4 +1,8 @@
+require_relative 'manufacturer.rb'
+
 class Car
+  
+  include Manufacturer
   attr_reader :number
   attr_accessor :hooked
 
