@@ -1,12 +1,15 @@
 require_relative 'instance_counter.rb'
+require_relative 'validation.rb'
 
 class Station
   attr_reader :trains, :name
   include InstanceCounter
+  include Validation
   @@instances = []
   
   def initialize(name)
     @name = name
+    valid?
     @trains = []
     @@instances << self
     register_instance
@@ -29,5 +32,14 @@ class Station
   end
 
   def self.all
+    @@instances
+  end
+
+  def valid?
+    validate_station(self.name)
+    true
+  rescue
+    false
+  end
 
 end

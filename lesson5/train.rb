@@ -1,11 +1,13 @@
 require_relative 'instance_counter.rb'
 require_relative 'manufacturer.rb'
+require_relative 'validation.rb'
 
 class Train
   include InstanceCounter
   include Manufacturer
+  include Validation
   attr_accessor :speed, :route, :waggonage
-  attr_reader :number, :type, 
+  attr_reader :number, :type 
 
   @@trains = []
   
@@ -13,6 +15,7 @@ class Train
     @number = number
     @waggonage = []
     @speed = 0
+    valid?
     @@trains << self
     register_instance
   end
@@ -67,4 +70,11 @@ class Train
     @@trains.find { |train| train.number == train_number}
   end
   
+  def valid?
+    validate_train(self.number)
+    true
+  rescue
+    false
+  end
+
 end

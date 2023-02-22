@@ -1,12 +1,15 @@
 require_relative 'instance_counter.rb'
+require_relative 'validation.rb'
 
 class Route
   attr_accessor :stations, :name
   include InstanceCounter
+  include Validation
 
   def initialize(departure_station, arrival_station, name)
     @stations = [departure_station, arrival_station]
     @name = name
+    valid?
     register_instance
   end
 
@@ -20,6 +23,13 @@ class Route
 
   def view_route
     stations.each { |station| puts station.name }
+  end
+
+  def valid?
+    validate_route(self.number, self.stations)
+    true
+  rescue
+    false
   end
 
 end
