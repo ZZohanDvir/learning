@@ -15,7 +15,7 @@ class Train
     @number = number
     @waggonage = []
     @speed = 0
-    valid?
+    validate_train(number)
     @@trains << self
     register_instance
   end

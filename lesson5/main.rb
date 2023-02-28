@@ -78,9 +78,9 @@ class Railway
   end
 
   def create_train
-
+    begin
     puts 'Введите номер поезда'
-    train_number = STDIN.gets.chomp.to_i
+    train_number = STDIN.gets.chomp
     puts 'Введите тип поезда: 1 - грузовой, 2 - пассажирский'
     train_type = STDIN.gets.chomp.to_i
 
@@ -90,7 +90,14 @@ class Railway
     when 2
       @trains << PassengerTrain.new(train_number)
     else
-      puts 'Некорректный тип поезда'
+      begin
+      raise 'Некорректный тип поезда'
+      rescue RuntimeError
+        retry
+      end
+    end
+    rescue RuntimeError
+      retry
     end
 
     puts "Поезд с номером #{train_number} создан" 
