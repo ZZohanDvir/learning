@@ -77,4 +77,8 @@ class Train
     false
   end
 
+  def each_car(&block)
+    waggonage.each(&block)
+  end
+
 end

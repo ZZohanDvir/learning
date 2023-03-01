@@ -8,7 +8,8 @@ class Car
   attr_reader :number
   attr_accessor :hooked
 
-  def initialize(number)
+  def initialize(number, capacity)
+    @capacity = capacity
     @number = number
     validate_car(number)
   end

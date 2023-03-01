@@ -33,7 +33,8 @@ class Railway
     menu = ['1 - Создать станцию', '2 - Создать поезд', 
     '3 - Создать маршрут, добавить/удалить станцию', '4 - Назначить поезду маршрут', 
     '5 - Добавить/отцепить вагоны', '6 - Переместить поезд по маршруту', 
-    '7 - Вывести список станций', '8 - Вывести список поездов', '9 - Вывести список маршрутов', 
+    '7 - Вывести список станций', '8 - Вывести список поездов на станции', '9 - Вывести список маршрутов',
+    '10 - Вывести список вагонов поезда', '11 - Занять место в вагоне/загрузить вагон',
     '0 - Выйти']
     puts 'Выберите действие'
     puts menu
@@ -64,6 +65,10 @@ class Railway
         show_trains_on_station
       when 9
         show_routes
+      when 10
+        show_cars
+      when 11
+        car_load
       when 0
         exit
     end
@@ -197,7 +202,7 @@ class Railway
   def car_manipulation
     puts 'Выберите поезд'
     @trains.each { |train| puts train.number }
-    train_number = STDIN.gets.chomp.to_i
+    train_number = STDIN.gets.chomp
     puts
     train_choice = nil
     @trains.each { |train| train_choice = train if train.number == train_number }
@@ -218,16 +223,22 @@ class Railway
       puts 'Введите номер вагона'
       car_number = STDIN.gets.chomp.to_i
       if train_choice.type == :cargo
-        car_to_add = CargoCar.new(car_number)
+        puts "Введите полный объем вагона"
+        capacity = STDIN.gets.chomp.to_i
+        car_to_add = CargoCar.new(car_number, capacity)
+        train_choice.car_hook(car_to_add)
+        puts "Грузовой вагон с номером #{car_to_add.number} прицеплен. Свободный объем - #{car_to_add.available_capacity}"
       elsif train_choice.type == :passenger
-        car_to_add = PassengerCar.new(car_number)
+        puts "Введите количество мест в вагоне"
+        capacity = STDIN.gets.chomp.to_i
+        car_to_add = PassengerCar.new(car_number, capacity)
+        train_choice.car_hook(car_to_add)
+        puts "Пассажирский вагон с номером #{car_to_add.number} прицеплен. Количество свободных мест - #{car_to_add.available_seating_capacity}"
       end
       rescue RuntimeError => e
         e.message
         retry
       end
-      train_choice.car_hook(car_to_add)
-      puts 'Вагон прицеплен'
     end
   end
 
@@ -264,7 +275,7 @@ class Railway
     @stations.each { |station| station_choice = station if station.name == station_name}
 
     puts "Список поездов на станции: "
-    station_choice.trains.each { |train| puts train.number}
+    station_choice.each_train { |train| puts train.number}
   end
 
   def show_routes
@@ -272,6 +283,42 @@ class Railway
     puts @routes.each { |route| puts route.name }
   end
 
+  def show_cars
+    puts 'Выберите поезд'
+    @trains.each { |train| puts train.number }
+    train_number = STDIN.gets.chomp
+    train_choice = nil
+    @trains.each { |train| train_choice = train if train.number == train_number }
+    if train_choice.type == :cargo
+      train_choice.each_car { puts "Вагон с номером #{car.number}. Общий объем - #{car.total_capacity}, 
+      свободный объем - #{available_capacity}, занятый объем - #{unavailable_capacity}" }
+    elsif train_choice.type == :passenger
+      train_choice.each_car { |car| puts "Вагон с номером #{car.number}. Общее количество мест - #{car.total_seating_capacity}, 
+      свободных мест - #{car.available_seating_capacity}, занятых мест - #{car.unavailable_seating_capacity}" }
+    end
+  end
+  
+  def car_load
+    begin
+    show_cars
+    puts "Выберите вагон используя номер"
+    choice = STDIN.gets.chomp.to_i
+    car_to_load = nil
+    train.each_car { |car| car_to_load = car if car.number == choice}
+    if car_to_load.type == :cargo
+      puts "Сколько вы хотите загрузить?"
+      capacity = STDIN.gets.chomp.to_i
+      car_to_load.load_car(capacity)
+      puts "Успешно загружено #{capacity}. Свободный объем - #{car_to_load.available_capacity}"
+    elsif car_to_load.type == :passenger
+      car_to_load.take_a_seat
+      puts "Одно место успешно занято. Количество свободных мест - #{car_to_load.available_seating_capacity}"
+    end
+    rescue RuntimeError => e
+      puts e.message
+      retry
+    end
+  end
 end
 
 Railway.new.start
