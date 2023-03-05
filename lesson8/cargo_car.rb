@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 class CargoCar < Car
   attr_reader :number, :type, :total_capacity
   attr_accessor :hooked, :available_capacity, :unavailable_capacity
@@ -6,14 +8,11 @@ class CargoCar < Car
     super
     @type = :cargo
   end
-  
-  def load_car(volume)
-    if volume <= @available_capacity
-      @available_capacity += -volume
-      @unavailable_capacity += volume
-    else
-      raise 'Недостаточно места'
-    end
-  end
 
+  def load_car(volume)
+    raise 'Недостаточно места' unless volume <= @available_capacity
+
+    @available_capacity += -volume
+    @unavailable_capacity += volume
+  end
 end

@@ -1,8 +1,9 @@
-require_relative 'manufacturer.rb'
-require_relative 'validation.rb'
+# frozen-string-literal: true
+
+require_relative 'manufacturer'
+require_relative 'validation'
 
 class Car
-  
   include Manufacturer
   include Validation
   attr_reader :number, :total_capacity
@@ -26,10 +27,9 @@ class Car
   end
 
   def valid?
-    validate_car(self.number)
+    validate_car(number)
     true
-  rescue
+  rescue StandardError
     false
   end
-
 end

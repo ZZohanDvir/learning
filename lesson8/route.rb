@@ -1,8 +1,11 @@
-require_relative 'instance_counter.rb'
-require_relative 'validation.rb'
+# frozen-string-literal: true
+
+require_relative 'instance_counter'
+require_relative 'validation'
 
 class Route
   attr_accessor :stations, :name
+
   include InstanceCounter
   include Validation
 
@@ -17,7 +20,7 @@ class Route
     stations.insert(-2, station)
   end
 
-  def  del_station(station)
+  def del_station(station)
     stations.delete(station)
   end
 
@@ -26,10 +29,9 @@ class Route
   end
 
   def valid?
-    validate_route(self.number, self.stations)
+    validate_route(number, stations)
     true
-  rescue
+  rescue StandardError
     false
   end
-
 end

@@ -1,10 +1,11 @@
-module Validation
+# frozen-string-literal: true
 
-  Train_number_sample = /^(\d|.){3}-?(\d|.){2}$/
-  
+module Validation
+  TRAIN_NUMBER_SAMPLE = /^(\d|.){3}-?(\d|.){2}$/.freeze
+
   def validate_train(number)
     raise 'Отсутствет номер поезда' if number.nil?
-    raise 'Номер не соответствует шаблону' unless number.match(Train_number_sample)
+    raise 'Номер не соответствует шаблону' unless number.match(TRAIN_NUMBER_SAMPLE)
   end
 
   def validate_route(name, stations)
@@ -19,5 +20,4 @@ module Validation
   def validate_car(number)
     raise 'Номер вагона не указан' if number.nil?
   end
-
 end
