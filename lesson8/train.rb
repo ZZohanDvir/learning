@@ -3,15 +3,24 @@
 require_relative 'instance_counter'
 require_relative 'manufacturer'
 require_relative 'validation'
+require_relative 'accessors'
 
 class Train
+  include Accessors
   include InstanceCounter
   include Manufacturer
   include Validation
-  attr_accessor :speed, :route, :waggonage
+  attr_accessor_with_history :speed
+  attr_accessor :route, :waggonage
   attr_reader :number, :type
 
+  TRAIN_NUMBER_SAMPLE = /^(\d|.){3}-?(\d|.){2}$/.freeze
+  
   @@trains = []
+
+  validate :number, :presence
+  validate :number, :type, String
+  validate :number, :format, TRAIN_NUMBER_SAMPLE
 
   def initialize(number)
     @number = number

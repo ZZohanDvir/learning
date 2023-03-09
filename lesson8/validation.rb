@@ -1,23 +1,44 @@
 # frozen-string-literal: true
 
 module Validation
-  TRAIN_NUMBER_SAMPLE = /^(\d|.){3}-?(\d|.){2}$/.freeze
-
-  def validate_train(number)
-    raise 'Отсутствет номер поезда' if number.nil?
-    raise 'Номер не соответствует шаблону' unless number.match(TRAIN_NUMBER_SAMPLE)
+  def self.included(base)
+    base.extend ClassMethods
+    base.include InstanceMethods
+  end
+  
+  module ClassMethods
+    def validates
+      @validates ||= []
+    end
+    
+    def validate(*args)
+      define_method("#{args[0]}_#{args[1]}") do
+        var_name = instance_variable_get("@#{args[0]}")
+        if args[1] == :presence
+          raise 'Имя не должно быть пустым' if var_name.nil? || var_name.to_s.empty?
+        elsif args[1] == :format
+          regexp = args[2]
+          raise 'Неверный формат имени' if var_name !~ regexp
+        elsif args[1] == :type
+          type = args[2]
+          raise 'Неверный тип' if var_name.class != type
+        end
+      end
+      validates << "#{args[0]}_#{args[1]}".to_sym
+    end
   end
 
-  def validate_route(name, stations)
-    raise 'Название маршрута не может быть пустым' if name.nil?
-    raise 'Границы маршрута не указаны' if stations.size < 2
+  module InstanceMethods
+    def validate!
+      self.class.validates.each {|method| send(method)}
+    end
+    
+    def valid?
+      validate!
+      true
+      rescue RuntimeError
+        false
+      end
   end
 
-  def validate_station(name)
-    raise 'Имя станции не указано' if name.nil?
-  end
-
-  def validate_car(number)
-    raise 'Номер вагона не указан' if number.nil?
-  end
 end

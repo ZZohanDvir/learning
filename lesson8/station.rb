@@ -8,7 +8,11 @@ class Station
 
   include InstanceCounter
   include Validation
+
   @@instances = []
+
+  validate :name, :presence
+  validate :name, :type, String 
 
   def initialize(name)
     @name = name
